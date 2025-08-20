@@ -129,7 +129,13 @@ export default function DocumentPanel({
             </div>
 
             <div className="flex-1 p-4">
-                {activeTab === 'upload' && (
+                {uploading && (
+                    <div className="flex flex-col items-center justify-center h-full gap-4">
+                        <span className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                        <span className="text-white text-lg font-medium">Uploading document...</span>
+                    </div>
+                )}
+                {!uploading && activeTab === 'upload' && (
                     <div>
                         <div
                             onDrop={handleDrop}
@@ -157,7 +163,7 @@ export default function DocumentPanel({
                     </div>
                 )}
 
-                {activeTab === 'url' && (
+                {!uploading && activeTab === 'url' && (
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">

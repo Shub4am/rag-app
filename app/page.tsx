@@ -9,6 +9,22 @@ import { Collection, ChatMessage } from '@/types';
 export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('pdfs-collection');
+  const handleCollectionSelect = (collectionName: string) => {
+    setSelectedCollection(collectionName);
+    if (!collections.some((c) => c.name === collectionName)) {
+      setCollections([
+        ...collections,
+        {
+          name: collectionName,
+          documentCount: 0,
+          lastUpdated: new Date().toISOString(),
+        },
+      ]);
+    }
+  };
+  const handleDocumentAdded = async () => {
+    await fetchCollections();
+  };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -21,12 +37,7 @@ export default function Home() {
       const response = await fetch('/api/collections');
       const data = await response.json();
       if (data.success) {
-        const collectionsWithCounts = data.collections.map((name: string) => ({
-          name,
-          documentCount: 0, // You can enhance this by adding a count endpoint
-          lastUpdated: new Date().toISOString()
-        }));
-        setCollections(collectionsWithCounts);
+        setCollections(data.collections);
       }
     } catch (error) {
       console.error('Error fetching collections:', error);
@@ -78,7 +89,7 @@ export default function Home() {
       <Sidebar
         collections={collections}
         selectedCollection={selectedCollection}
-        onCollectionSelect={setSelectedCollection}
+        onCollectionSelect={handleCollectionSelect}
         onRefresh={fetchCollections}
       />
 
@@ -94,7 +105,7 @@ export default function Home() {
 
         <DocumentPanel
           selectedCollection={selectedCollection}
-          onDocumentAdded={fetchCollections}
+          onDocumentAdded={handleDocumentAdded}
         />
       </div>
     </div>

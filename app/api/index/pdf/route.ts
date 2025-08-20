@@ -41,7 +41,6 @@ async function saveToQdrant(docs: any[], collectionName: string) {
         await vectorStore.addDocuments(docs);
         return { success: true, count: docs.length };
     } catch (error) {
-        // If collection doesn't exist, create it
         if (
             typeof error === 'object' &&
             error !== null &&
@@ -79,14 +78,22 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
-
-        // Create uploads directory if it doesn't exist
         const uploadsDir = './uploads';
         if (!existsSync(uploadsDir)) {
             await mkdir(uploadsDir, { recursive: true });
         }
-
-        // Save file temporarily
+        const collectionsFile = path.join(uploadsDir, 'collections.json');
+        let collections: string[] = [];
+        try {
+            const data = await import('fs/promises').then(fs => fs.readFile(collectionsFile, 'utf-8'));
+            collections = JSON.parse(data);
+        } catch (err) {
+            collections = [];
+        }
+        if (!collections.includes(collection)) {
+            collections.push(collection);
+            await import('fs/promises').then(fs => fs.writeFile(collectionsFile, JSON.stringify(collections, null, 2), 'utf-8'));
+        }
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -105,8 +112,6 @@ export async function POST(request: NextRequest) {
             });
 
             const result = await saveToQdrant(splitDocsResult, collection);
-
-            // Clean up uploaded file
             await unlink(filepath);
 
             return NextResponse.json({
@@ -117,7 +122,6 @@ export async function POST(request: NextRequest) {
                 created: result.created || false,
             });
         } catch (error) {
-            // Clean up file if it exists
             if (existsSync(filepath)) {
                 await unlink(filepath);
             }
