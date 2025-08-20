@@ -9,12 +9,12 @@ export async function GET() {
         ];
 
         return NextResponse.json({ success: true, collections });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error getting collections:', error);
         return NextResponse.json(
             {
                 error: 'Failed to get collections',
-                details: error.message,
+                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
             },
             { status: 500 }
         );

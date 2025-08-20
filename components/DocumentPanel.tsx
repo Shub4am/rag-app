@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadIcon, LinkIcon, FileTextIcon, GlobeIcon, XIcon } from 'lucide-react';
+import { UploadIcon, LinkIcon, FileTextIcon, GlobeIcon } from 'lucide-react';
 
 interface DocumentPanelProps {
     selectedCollection: string;

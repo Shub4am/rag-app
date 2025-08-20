@@ -103,12 +103,12 @@ export async function POST(request: NextRequest) {
             sources,
             collection,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error in chat:', error);
         return NextResponse.json(
             {
                 error: 'Failed to process chat request',
-                details: error.message,
+                details: error instanceof Error ? error.message : String(error),
             },
             { status: 500 }
         );

@@ -34,11 +34,17 @@ export async function saveToQdrant(docs: any[], collectionName: string) {
 
         await vectorStore.addDocuments(docs);
         return { success: true, count: docs.length };
-    } catch (error: any) {
+    } catch (error) {
         // If collection doesn't exist, create it
         if (
-            error.message.includes('not found') ||
-            error.message.includes('does not exist')
+            typeof error === 'object' &&
+            error !== null &&
+            'message' in error &&
+            typeof (error as any).message === 'string' &&
+            (
+                (error as any).message.includes('not found') ||
+                (error as any).message.includes('does not exist')
+            )
         ) {
             const vectorStore = await QdrantVectorStore.fromDocuments(
                 docs,
@@ -48,6 +54,7 @@ export async function saveToQdrant(docs: any[], collectionName: string) {
                     collectionName,
                 },
             );
+            console.log(vectorStore)
             return { success: true, count: docs.length, created: true };
         }
         throw error;

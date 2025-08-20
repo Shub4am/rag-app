@@ -40,11 +40,17 @@ async function saveToQdrant(docs: any[], collectionName: string) {
 
         await vectorStore.addDocuments(docs);
         return { success: true, count: docs.length };
-    } catch (error: any) {
+    } catch (error) {
         // If collection doesn't exist, create it
         if (
-            error.message.includes('not found') ||
-            error.message.includes('does not exist')
+            typeof error === 'object' &&
+            error !== null &&
+            'message' in error &&
+            typeof (error).message === 'string' &&
+            (
+                (error).message.includes('not found') ||
+                (error).message.includes('does not exist')
+            )
         ) {
             const vectorStore = await QdrantVectorStore.fromDocuments(
                 docs,
@@ -54,6 +60,7 @@ async function saveToQdrant(docs: any[], collectionName: string) {
                     collectionName,
                 },
             );
+            console.log(vectorStore)
             return { success: true, count: docs.length, created: true };
         }
         throw error;
@@ -109,19 +116,19 @@ export async function POST(request: NextRequest) {
                 documentsCount: result.count,
                 created: result.created || false,
             });
-        } catch (error: any) {
+        } catch (error) {
             // Clean up file if it exists
             if (existsSync(filepath)) {
                 await unlink(filepath);
             }
             throw error;
         }
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error indexing PDF:', error);
         return NextResponse.json(
             {
                 error: 'Failed to index PDF',
-                details: error.message,
+                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
             },
             { status: 500 }
         );

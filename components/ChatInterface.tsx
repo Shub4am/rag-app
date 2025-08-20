@@ -35,17 +35,17 @@ export default function ChatInterface({
     };
 
     const suggestedQuestions = [
-        "What is the main topic of the documents?",
+        "What is the document about?",
         "Summarize the key points from the pdf or uploaded url",
     ];
 
     return (
         <div className="flex flex-col h-full">
             <div className="bg-zinc-900 border-b border-gray-200 p-4">
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold text-white uppercase">
                     Chat with {selectedCollection}
                 </h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                     Ask questions about your documents
                 </p>
             </div>
@@ -53,7 +53,7 @@ export default function ChatInterface({
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-900">
                 {messages.length === 0 ? (
                     <div className="text-center py-12">
-                        <BotIcon className="w-12 h-12 text-white mx-auto mb-4" />
+                        <BotIcon className="w-12 h-12 text-amber-300 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-gray-200 mb-2">
                             Start a conversation
                         </h3>

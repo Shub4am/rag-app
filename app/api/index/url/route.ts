@@ -33,12 +33,12 @@ export async function POST(request: NextRequest) {
             url,
             created: result.created || false,
         });
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error indexing URL:', error);
         return NextResponse.json(
             {
                 error: 'Failed to index URL',
-                details: error.message,
+                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
             },
             { status: 500 }
         );
