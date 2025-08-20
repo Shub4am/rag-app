@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
             try {
                 await qdrant.createCollection(name, {
                     vectors: {
-                        size: 1536,
+                        size: 3072,
                         distance: 'Cosine'
                     }
                 });
