@@ -20,11 +20,19 @@ export default function Sidebar({
     const [newCollectionName, setNewCollectionName] = useState('');
     const [showNewCollection, setShowNewCollection] = useState(false);
 
-    const handleCreateCollection = () => {
-        if (newCollectionName.trim()) {
-            onCollectionSelect(newCollectionName.trim());
+    const handleCreateCollection = async () => {
+        const name = newCollectionName.trim();
+        if (!name) return;
+        const res = await fetch('/api/collections', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }),
+        });
+        if (res.ok) {
+            onCollectionSelect(name);
             setNewCollectionName('');
             setShowNewCollection(false);
+            onRefresh();
         }
     };
 

@@ -20,6 +20,7 @@ export default function ChatInterface({
     selectedCollection
 }: ChatInterfaceProps) {
     const [input, setInput] = useState('');
+    const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -28,6 +29,11 @@ export default function ChatInterface({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
+        if (!selectedCollection) {
+            setError('Please select or create a collection before chatting.');
+            return;
+        }
         if (input.trim() && !loading) {
             onSendMessage(input.trim());
             setInput('');
@@ -98,6 +104,9 @@ export default function ChatInterface({
             </div>
 
             <div className="bg-zinc-900 border-t border-gray-200 p-4">
+                {error && (
+                    <div className="mb-2 text-red-500 text-sm font-medium">{error}</div>
+                )}
                 <form onSubmit={handleSubmit} className="flex gap-3">
                     <input
                         type="text"

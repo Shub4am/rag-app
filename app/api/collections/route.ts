@@ -1,3 +1,35 @@
+import { NextRequest } from 'next/server';
+
+export async function POST(request: NextRequest) {
+    try {
+        const { name } = await request.json();
+        if (!name || typeof name !== 'string' || !name.trim()) {
+            return NextResponse.json({ error: 'Collection name is required.' }, { status: 400 });
+        }
+        const collectionsFile = path.join(process.cwd(), 'uploads', 'collections.json');
+        let collections: string[] = [];
+        try {
+            const data = await fs.readFile(collectionsFile, 'utf-8');
+            collections = JSON.parse(data);
+        } catch (err) {
+            collections = [];
+        }
+        if (!collections.includes(name)) {
+            collections.push(name);
+            await fs.writeFile(collectionsFile, JSON.stringify(collections, null, 2), 'utf-8');
+        }
+        return NextResponse.json({ success: true, collections });
+    } catch (error) {
+        console.error('Error creating collection:', error);
+        return NextResponse.json(
+            {
+                error: 'Failed to create collection',
+                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
+            },
+            { status: 500 }
+        );
+    }
+}
 
 import { NextResponse } from 'next/server';
 import { promises as fs } from 'fs';

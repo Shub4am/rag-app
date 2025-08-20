@@ -8,11 +8,16 @@ const client = new OpenAI();
 
 export async function POST(request: NextRequest) {
     try {
-        const { message, collection = 'pdfs-collection' } = await request.json();
-
+        const { message, collection } = await request.json();
         if (!message) {
             return NextResponse.json(
                 { error: 'Message is required' },
+                { status: 400 }
+            );
+        }
+        if (!collection) {
+            return NextResponse.json(
+                { error: 'Collection is required' },
                 { status: 400 }
             );
         }

@@ -16,8 +16,14 @@ export default function DocumentPanel({
     const [uploading, setUploading] = useState(false);
     const [url, setUrl] = useState('');
     const [status, setStatus] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
     const handleFileUpload = async (file: File) => {
+        setError(null);
+        if (!selectedCollection) {
+            setError('Please select or create a collection before uploading.');
+            return;
+        }
         setUploading(true);
         setStatus('');
 
@@ -58,6 +64,11 @@ export default function DocumentPanel({
     };
 
     const handleUrlIndex = async () => {
+        setError(null);
+        if (!selectedCollection) {
+            setError('Please select or create a collection before uploading.');
+            return;
+        }
         if (!url.trim()) return;
 
         setUploading(true);
@@ -129,6 +140,9 @@ export default function DocumentPanel({
             </div>
 
             <div className="flex-1 p-4">
+                {error && (
+                    <div className="mb-2 text-red-500 text-sm font-medium">{error}</div>
+                )}
                 {uploading && (
                     <div className="flex flex-col items-center justify-center h-full gap-4">
                         <span className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
