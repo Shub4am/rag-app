@@ -17,8 +17,39 @@ export default function Sidebar({
     onCollectionSelect,
     onRefresh
 }: SidebarProps) {
+    const [textToStore, setTextToStore] = useState('');
+    const [storeStatus, setStoreStatus] = useState<string | null>(null);
+    const [storeLoading, setStoreLoading] = useState(false);
     const [newCollectionName, setNewCollectionName] = useState('');
     const [showNewCollection, setShowNewCollection] = useState(false);
+
+    const handleStoreText = async () => {
+        setStoreStatus(null);
+        if (!selectedCollection) {
+            setStoreStatus('Please select a collection first.');
+            return;
+        }
+        if (!textToStore.trim()) {
+            setStoreStatus('Please enter some text.');
+            return;
+        }
+        setStoreLoading(true);
+        const res = await fetch('/api/collections/store', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ collection: selectedCollection, text: textToStore.trim() }),
+        });
+        if (res.ok) {
+            setStoreStatus('Text stored successfully!');
+            setTextToStore('');
+            onRefresh();
+        } else {
+            const data = await res.json();
+            setStoreStatus(data.error || 'Failed to store text.');
+        }
+        setStoreLoading(false);
+        console.log("stored test:", textToStore)
+    };
 
     const handleCreateCollection = async () => {
         const name = newCollectionName.trim();
@@ -76,7 +107,6 @@ export default function Sidebar({
                     </div>
                 )}
             </div>
-
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4">
                     <h2 className="text-sm font-medium text-white mb-3">Your Notebooks</h2>
@@ -105,6 +135,28 @@ export default function Sidebar({
                         ))}
                     </div>
                 </div>
+            </div>
+            {/* Textarea for storing text in Qdrant */}
+            <div className="flex flex-col p-4 border-b border-gray-800 items-center justify-center">
+                <label className="block text-white font-medium mb-2 text-center">Data Store</label>
+                <textarea
+                    value={textToStore}
+                    onChange={e => setTextToStore(e.target.value)}
+                    rows={8}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 bg-zinc-800 text-white"
+                    placeholder="Enter text to store in the selected collection..."
+                    disabled={storeLoading}
+                />
+                <button
+                    onClick={handleStoreText}
+                    disabled={storeLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                >
+                    {storeLoading ? 'Storing...' : 'Submit'}
+                </button>
+                {storeStatus && (
+                    <div className={`mt-2 text-sm ${storeStatus.includes('success') ? 'text-green-500' : 'text-red-500'}`}>{storeStatus}</div>
+                )}
             </div>
         </div>
     );
