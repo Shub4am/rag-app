@@ -1,4 +1,10 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { QdrantClient } from '@qdrant/js-client-rest';
+
+const qdrant = new QdrantClient({
+    url: process.env.QDRANT_URL || 'http://localhost:6333',
+    apiKey: process.env.QDRANT_API_KEY,
+});
 
 export async function POST(request: NextRequest) {
     try {
@@ -6,74 +12,86 @@ export async function POST(request: NextRequest) {
         if (!name || typeof name !== 'string' || !name.trim()) {
             return NextResponse.json({ error: 'Collection name is required.' }, { status: 400 });
         }
-        const collectionsFile = path.join(process.cwd(), 'uploads', 'collections.json');
-        let collections: string[] = [];
+        let collectionExists = false;
         try {
-            const data = await fs.readFile(collectionsFile, 'utf-8');
-            collections = JSON.parse(data);
-        } catch (err) {
-            collections = [];
+            await qdrant.getCollection(name);
+            collectionExists = true;
+        } catch (error) {
         }
-        if (!collections.includes(name)) {
-            collections.push(name);
-            await fs.writeFile(collectionsFile, JSON.stringify(collections, null, 2), 'utf-8');
+
+        if (!collectionExists) {
+            try {
+                await qdrant.createCollection(name, {
+                    vectors: {
+                        size: 1536,
+                        distance: 'Cosine'
+                    }
+                });
+                console.log(`Successfully created collection: ${name}`);
+            } catch (createError) {
+                console.error('Failed to create collection in Qdrant:', createError);
+                return NextResponse.json(
+                    {
+                        error: 'Failed to create collection in vector database',
+                        details: createError instanceof Error ? createError.message : String(createError),
+                    },
+                    { status: 500 }
+                );
+            }
         }
-        return NextResponse.json({ success: true, collections });
+        try {
+            const collectionsResponse = await qdrant.getCollections();
+            const collections = collectionsResponse.collections.map(c => c.name);
+            return NextResponse.json({ success: true, collections });
+        } catch (error) {
+            console.error('Failed to fetch collections:', error);
+            return NextResponse.json(
+                {
+                    error: 'Collection may have been created but failed to fetch updated list',
+                    details: error instanceof Error ? error.message : String(error),
+                },
+                { status: 500 }
+            );
+        }
+
     } catch (error) {
-        console.error('Error creating collection:', error);
+        console.error('Error in POST handler:', error);
         return NextResponse.json(
             {
-                error: 'Failed to create collection',
-                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
+                error: 'Failed to process request',
+                details: error instanceof Error ? error.message : String(error),
             },
             { status: 500 }
         );
     }
 }
 
-import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { QdrantClient } from '@qdrant/js-client-rest';
-
 export async function GET() {
     try {
-        const collectionsFile = path.join(process.cwd(), 'uploads', 'collections.json');
-        let collections: string[] = [];
-        try {
-            const data = await fs.readFile(collectionsFile, 'utf-8');
-            collections = JSON.parse(data);
-        } catch (err) {
-            collections = [];
-        }
-        const qdrant = new QdrantClient({
-            url: process.env.QDRANT_URL || 'http://localhost:6333',
-            apiKey: process.env.QDRANT_API_KEY,
-        });
+        const collectionsResponse = await qdrant.getCollections();
         const collectionsWithCounts = await Promise.all(
-            collections.map(async (name) => {
+            collectionsResponse.collections.map(async (collection) => {
                 let documentCount = 0;
                 try {
-                    const info = await qdrant.getCollection(name);
+                    const info = await qdrant.getCollection(collection.name);
                     documentCount = info.points_count || 0;
                 } catch (err) {
                     documentCount = 0;
                 }
                 return {
-                    name,
+                    name: collection.name,
                     documentCount,
                     lastUpdated: new Date().toISOString(),
                 };
             })
         );
-
         return NextResponse.json({ success: true, collections: collectionsWithCounts });
     } catch (error) {
         console.error('Error getting collections:', error);
         return NextResponse.json(
             {
                 error: 'Failed to get collections',
-                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
+                details: error instanceof Error ? error.message : String(error),
             },
             { status: 500 }
         );
