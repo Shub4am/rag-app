@@ -30,7 +30,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
                 {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 space-y-2">
-                        <div className="text-sm text-gray-600 font-medium">Sources:</div>
+                        <div className="text-sm text-gray-400 font-medium">Sources:</div>
                         {message.sources.map((source, index) => (
                             <div
                                 key={index}
@@ -38,9 +38,9 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                             >
                                 <div className="flex items-start gap-2">
                                     {source.source ? (
-                                        <GlobeIcon className="w-4 h-4 text-gray-500 mt-0.5" />
+                                        <GlobeIcon className="w-4 h-4 text-gray-200 mt-0.5" />
                                     ) : (
-                                        <FileTextIcon className="w-4 h-4 text-gray-500 mt-0.5" />
+                                        <FileTextIcon className="w-4 h-4 text-gray-200 mt-0.5" />
                                     )}
                                     <div className="flex-1">
                                         <div className="font-medium text-gray-900">
@@ -48,7 +48,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                                             {source.pageNumber && ` (Page ${source.pageNumber})`}
                                             {source.row && ` (Row ${source.row})`}
                                         </div>
-                                        <div className="text-gray-600 mt-1">{source.content}</div>
+                                        <div className="text-gray-400 mt-1">{source.content}</div>
                                     </div>
                                 </div>
                             </div>
