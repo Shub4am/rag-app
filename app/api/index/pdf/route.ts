@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
+import fetch from 'node-fetch';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import { OpenAIEmbeddings } from '@langchain/openai';
@@ -78,55 +77,38 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
-        const uploadsDir = './uploads';
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
-        }
-        const collectionsFile = path.join(uploadsDir, 'collections.json');
-        let collections: string[] = [];
-        try {
-            const data = await import('fs/promises').then(fs => fs.readFile(collectionsFile, 'utf-8'));
-            collections = JSON.parse(data);
-        } catch (err) {
-            collections = [];
-        }
-        if (!collections.includes(collection)) {
-            collections.push(collection);
-            await import('fs/promises').then(fs => fs.writeFile(collectionsFile, JSON.stringify(collections, null, 2), 'utf-8'));
-        }
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const filename = `pdf-${uniqueSuffix}.pdf`;
-        const filepath = path.join(uploadsDir, filename);
 
-        await writeFile(filepath, buffer);
+        // Upload to Vercel Blob
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const blobName = `pdf-${Date.now()}-${Math.round(Math.random() * 1e9)}.pdf`;
+        const blob = await put(blobName, buffer, { access: 'public' });
 
-        try {
-            const loader = new PDFLoader(filepath, { splitPages: true });
-            const docs = await loader.load();
 
-            const splitDocsResult = await splitDocs(docs, {
-                filename: file.name,
-                uploadDate: new Date().toISOString(),
-            });
+        // Download the file from Blob to process it (PDFLoader expects a Blob or file path)
+        const blobRes = await fetch(blob.url);
+        const blobArrayBuffer = await blobRes.arrayBuffer();
+        const pdfBlob = new Blob([blobArrayBuffer], { type: 'application/pdf' });
 
-            const result = await saveToQdrant(splitDocsResult, collection);
-            await unlink(filepath);
+        // Use PDFLoader with Blob
+        const loader = new PDFLoader(pdfBlob, { splitPages: true });
+        const docs = await loader.load();
 
-            return NextResponse.json({
-                success: true,
-                message: `PDF indexed successfully! ${result.count} chunks added to ${collection}`,
-                collection,
-                documentsCount: result.count,
-                created: result.created || false,
-            });
-        } catch (error) {
-            if (existsSync(filepath)) {
-                await unlink(filepath);
-            }
-            throw error;
-        }
+        const splitDocsResult = await splitDocs(docs, {
+            filename: file.name,
+            uploadDate: new Date().toISOString(),
+        });
+
+        const result = await saveToQdrant(splitDocsResult, collection);
+
+        return NextResponse.json({
+            success: true,
+            message: `PDF indexed successfully! ${result.count} chunks added to ${collection}`,
+            collection,
+            documentsCount: result.count,
+            created: result.created || false,
+            blobUrl: blob.url,
+        });
     } catch (error) {
         console.error('Error indexing PDF:', error);
         return NextResponse.json(
