@@ -31,7 +31,9 @@ A Next.js-based Retrieval-Augmented Generation (RAG) application that allows use
 └── README.md               # Project documentation
 ```
 
-## Getting Started
+## Project Screenshot
+
+<img width="1920" height="1080" alt="Screenshot 2025-08-20 144910" src="https://github.com/user-attachments/assets/cbe2a75f-16e0-43ed-9266-920d68e82be4" />
 
 ### Prerequisites
 - Node.js (v18+ recommended)
