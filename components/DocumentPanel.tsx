@@ -35,7 +35,11 @@ export default function DocumentPanel({
             if (file.type === 'application/pdf') {
                 formData.append('pdf', file);
                 endpoint = '/api/index/pdf';
-            } else if (file.type === 'text/csv') {
+            } else if (
+                file.type === 'text/csv' ||
+                (!file.type && file.name.toLowerCase().endsWith('.csv')) ||
+                file.name.toLowerCase().endsWith('.csv')
+            ) {
                 formData.append('csv', file);
                 endpoint = '/api/index/csv';
             } else {

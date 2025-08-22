@@ -20,7 +20,7 @@ export async function saveToQdrant(docs: any[], collectionName: string) {
         throw new Error(`No documents to index for ${collectionName}`);
     }
 
-    const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-large' });
+    const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-small' });
 
     try {
         const vectorStore = await QdrantVectorStore.fromExistingCollection(
@@ -35,7 +35,6 @@ export async function saveToQdrant(docs: any[], collectionName: string) {
         await vectorStore.addDocuments(docs);
         return { success: true, count: docs.length };
     } catch (error) {
-        // If collection doesn't exist, create it
         if (
             typeof error === 'object' &&
             error !== null &&

@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { QdrantVectorStore } from '@langchain/qdrant';
@@ -23,7 +22,7 @@ export async function POST(request: NextRequest) {
         }
 
         const embeddings = new OpenAIEmbeddings({
-            model: 'text-embedding-3-large',
+            model: 'text-embedding-3-small',
         });
 
         const vectorStore = await QdrantVectorStore.fromExistingCollection(
@@ -45,8 +44,6 @@ export async function POST(request: NextRequest) {
                 sources: [],
             });
         }
-
-        // Format context with sources
         const contextText = relevantChunks
             .map((doc, i) => {
                 const pageInfo = doc.metadata.pageNumber
@@ -70,13 +67,15 @@ export async function POST(request: NextRequest) {
 
         const SYSTEM_PROMPT = `
       You are an AI assistant who answers queries based ONLY on the given context. 
+      - Greet the user positively ONLY on the very first reply.
+      - DO NOT repeat the greeting in any later responses and try to divert conversation to the file upload or website url upload.
       Always cite the source:
       - For PDFs → include the page number and filename if available.
       - For web docs → include the source URL.
       - For CSVs → include row number and filename.
 
       If the answer is not in the context, reply:
-      "I don't know, based on the provided documents."
+      "Unsure about answer"
 
       Context:
       ${contextText}
@@ -91,9 +90,7 @@ export async function POST(request: NextRequest) {
         });
 
         const response = completion.choices[0].message.content;
-
-        // Extract source information for frontend display
-        const sources = relevantChunks.map((doc, i) => ({
+        let sources = relevantChunks.map((doc, i) => ({
             chunk: i + 1,
             pageNumber: doc.metadata.pageNumber,
             source: doc.metadata.source,
@@ -101,7 +98,9 @@ export async function POST(request: NextRequest) {
             filename: doc.metadata.filename || doc.metadata.file,
             content: doc.pageContent.substring(0, 200) + '...',
         }));
-
+        if (response && response.trim() === 'Unsure about answer' || "Hello! How can I assist you today?") {
+            sources = [];
+        }
         return NextResponse.json({
             success: true,
             response,

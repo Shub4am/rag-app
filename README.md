@@ -27,7 +27,7 @@ A Next.js-based Retrieval-Augmented Generation (RAG) application that allows use
 ├── package.json            # Project dependencies and scripts
 ├── tsconfig.json           # TypeScript configuration
 ├── next.config.ts          # Next.js configuration
-├── docker-compose.yml      # Docker setup (if used)
+├── docker-compose.yml      # Docker setup
 └── README.md               # Project documentation
 ```
 
@@ -44,7 +44,7 @@ A Next.js-based Retrieval-Augmented Generation (RAG) application that allows use
 
 1. Clone the repository:
 	```sh
-	git clone <repo-url>
+	git clone https://github.com/Shub4am/rag-app.git
 	cd rag-app
 	```
 2. Install dependencies:
@@ -61,11 +61,6 @@ A Next.js-based Retrieval-Augmented Generation (RAG) application that allows use
 	```
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Docker (Optional)
-If you want to run the app with Docker:
-```sh
-docker-compose up --build
-```
 
 ## Usage
 - Upload documents via the interface.

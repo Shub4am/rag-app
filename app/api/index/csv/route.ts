@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { CSVLoader } from '@langchain/community/document_loaders/fs/csv';
 import { saveToQdrant, splitDocs } from '@/lib/utils';
 
@@ -17,58 +15,46 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
-
-        // Create uploads directory if it doesn't exist
-        const uploadsDir = './uploads';
-        if (!existsSync(uploadsDir)) {
-            await mkdir(uploadsDir, { recursive: true });
+        if (file.size > 1048576) {
+            return NextResponse.json(
+                { error: 'CSV file size exceeds 1MB limit' },
+                { status: 400 }
+            );
         }
 
-        // Save file temporarily
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const filename = `csv-${uniqueSuffix}.csv`;
-        const filepath = path.join(uploadsDir, filename);
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const blobName = `csv-${Date.now()}-${Math.round(Math.random() * 1e9)}.csv`;
+        const blob = await put(blobName, buffer, { access: 'public' });
 
-        await writeFile(filepath, buffer);
+        const blobRes = await fetch(blob.url);
+        const blobArrayBuffer = await blobRes.arrayBuffer();
+        const csvBlob = new Blob([blobArrayBuffer], { type: 'text/csv' });
 
-        try {
-            const loader = new CSVLoader(filepath);
-            const docs = await loader.load();
+        const loader = new CSVLoader(csvBlob);
+        const docs = await loader.load();
+        const withMetadata = docs.map((doc, i) => ({
+            ...doc,
+            metadata: {
+                ...doc.metadata,
+                row: i + 1,
+                file: file.name,
+                uploadDate: new Date().toISOString(),
+            },
+        }));
 
-            // Add row + filename metadata
-            const withMetadata = docs.map((doc, i) => ({
-                ...doc,
-                metadata: {
-                    ...doc.metadata,
-                    row: i + 1,
-                    file: file.name,
-                    uploadDate: new Date().toISOString(),
-                },
-            }));
+        const splitDocsResult = await splitDocs(withMetadata);
+        const result = await saveToQdrant(splitDocsResult, collection);
 
-            const splitDocsResult = await splitDocs(withMetadata);
-            const result = await saveToQdrant(splitDocsResult, collection);
-
-            // Clean up uploaded file
-            await unlink(filepath);
-
-            return NextResponse.json({
-                success: true,
-                message: `CSV indexed successfully! ${result.count} chunks added to ${collection}`,
-                collection,
-                documentsCount: result.count,
-                rowsProcessed: docs.length,
-                created: result.created || false,
-            });
-        } catch (error) {
-            // Clean up file if it exists
-            if (existsSync(filepath)) {
-                await unlink(filepath);
-            }
-            throw error;
-        }
+        return NextResponse.json({
+            success: true,
+            message: `CSV indexed successfully! ${result.count} chunks added to ${collection}`,
+            collection,
+            documentsCount: result.count,
+            rowsProcessed: docs.length,
+            created: result.created || false,
+            blobUrl: blob.url,
+        });
     } catch (error) {
         console.error('Error indexing CSV:', error);
         return NextResponse.json(

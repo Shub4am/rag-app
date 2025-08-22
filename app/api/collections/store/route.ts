@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
             },
         };
 
-        const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-large' });
+        const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-small' });
         let vectorStore;
         try {
             vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {

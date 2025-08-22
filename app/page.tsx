@@ -9,6 +9,7 @@ import { Collection, ChatMessage } from '@/types';
 export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('');
+
   const handleCollectionSelect = (collectionName: string) => {
     setSelectedCollection(collectionName);
     if (!collections.some((c) => c.name === collectionName)) {
