@@ -113,18 +113,18 @@ export default function DocumentPanel({
     };
 
     return (
-        <div className="w-80 bg-zinc-900 border-l border-gray-200 flex flex-col">
+        <div className="w-80 bg-transparent border-l border-gray-200 flex flex-col">
             <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Add Sources
+                <h3 className="text-lg font-semibold text-gray-300 mb-4">
+                    Add Files
                 </h3>
 
-                <div className="flex bg-gray-100 rounded-lg p-1">
+                <div className="flex rounded-lg p-1 backdrop-blur-3xl">
                     <button
                         onClick={() => setActiveTab('upload')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === 'upload'
-                            ? 'bg-zinc-900 text-white shadow-sm'
-                            : 'text-gray-600 hover:text-blue-600'
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer  ${activeTab === 'upload'
+                            ? 'bg-blue-500 text-white shadow-sm'
+                            : 'text-gray-300 '
                             }`}
                     >
                         <UploadIcon className="w-4 h-4" />
@@ -132,9 +132,9 @@ export default function DocumentPanel({
                     </button>
                     <button
                         onClick={() => setActiveTab('url')}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === 'url'
-                            ? 'bg-zinc-900 text-white shadow-sm'
-                            : 'text-gray-600 hover:text-blue-600'
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${activeTab === 'url'
+                            ? 'bg-blue-500 text-white shadow-sm'
+                            : 'text-gray-300 '
                             }`}
                     >
                         <LinkIcon className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function DocumentPanel({
                         <div
                             onDrop={handleDrop}
                             onDragOver={(e) => e.preventDefault()}
-                            className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                            className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer backdrop-blur-2xl drop-shadow-xl drop-shadow-black"
                             onClick={() => {
                                 const input = document.createElement('input');
                                 input.type = 'file';
@@ -174,7 +174,7 @@ export default function DocumentPanel({
                             <p className="text-white mb-2">
                                 Drop files here or click to upload
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-300">
                                 PDF and CSV files supported
                             </p>
                         </div>
@@ -184,7 +184,7 @@ export default function DocumentPanel({
                 {!uploading && activeTab === 'url' && (
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Website URL
                             </label>
                             <input
@@ -192,7 +192,7 @@ export default function DocumentPanel({
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
                                 placeholder="https://example.com"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-2xl"
                             />
                         </div>
                         <button
@@ -217,7 +217,7 @@ export default function DocumentPanel({
             </div>
 
             <div className="p-4 border-t border-gray-200">
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-300">
                     Collection: <span className="font-medium">{selectedCollection}</span>
                 </div>
             </div>

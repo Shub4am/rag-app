@@ -5,6 +5,7 @@ import Sidebar from '@/components/Sidebar';
 import ChatInterface from '@/components/ChatInterface';
 import DocumentPanel from '@/components/DocumentPanel';
 import { Collection, ChatMessage } from '@/types';
+import Silk from '@/components/Silk';
 
 export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -86,15 +87,16 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
-      <Sidebar
-        collections={collections}
-        selectedCollection={selectedCollection}
-        onCollectionSelect={handleCollectionSelect}
-        onRefresh={fetchCollections}
-      />
+    <div className="flex h-screen bg-transparent">
+      <div className="flex-1 flex z-20">
+        <Sidebar
+          collections={collections}
+          selectedCollection={selectedCollection}
+          onCollectionSelect={handleCollectionSelect}
+          onRefresh={fetchCollections}
+        />
 
-      <div className="flex-1 flex">
+
         <div className="flex-1 flex flex-col">
           <ChatInterface
             messages={messages}
@@ -107,6 +109,15 @@ export default function Home() {
         <DocumentPanel
           selectedCollection={selectedCollection}
           onDocumentAdded={handleDocumentAdded}
+        />
+      </div>
+      <div className="absolute inset-0 w-full min-h-screen z-0 pointer-events-none">
+        <Silk
+          speed={10}
+          scale={1}
+          color="#8035F8"
+          noiseIntensity={1.5}
+          rotation={0}
         />
       </div>
     </div>

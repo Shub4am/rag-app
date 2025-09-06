@@ -22,7 +22,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 <div
                     className={`inline-block p-4 rounded-lg ${isUser
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900'
+                        : 'bg-zinc-800 text-gray-200'
                         }`}
                 >
                     <div className="whitespace-pre-wrap">{message.content}</div>
@@ -56,7 +56,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                     </div>
                 )}
 
-                <div className="text-xs text-gray-500 mt-2">
+                <div className="text-xs text-gray-300 mt-2">
                     {message.timestamp.toLocaleTimeString()}
                 </div>
             </div>

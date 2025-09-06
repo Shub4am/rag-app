@@ -68,13 +68,13 @@ export default function Sidebar({
     };
 
     return (
-        <div className="w-80 bg-zinc-900 border-r border-gray-200 flex flex-col">
-            <div className="p-4 border-b border-gray-800">
+        <div className="w-80 bg-transparent border-r border-gray-200 flex flex-col">
+            <div className="p-4 border-b border-gray-300">
                 <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-xl font-semibold text-white">Notebook LLM</h1>
+                    <h1 className="text-xl font-semibold text-white">Root LM</h1>
                     <button
                         onClick={onRefresh}
-                        className="p-2 hover:bg-gray-600 rounded-lg transition-colors"
+                        className="p-2 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer"
                     >
                         <RefreshCcwIcon className="w-4 h-4" />
                     </button>
@@ -82,14 +82,14 @@ export default function Sidebar({
 
                 <button
                     onClick={() => setShowNewCollection(!showNewCollection)}
-                    className="w-full flex items-center gap-2 p-3 bg-zinc-800 hover:bg-blue-700 border border-blue-200 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-2 p-3 hover:bg-blue-500 border border-blue-200 rounded-lg transition-colors backdrop-blur-2xl cursor-pointer"
                 >
                     <PlusIcon className="w-4 h-4 text-white" />
-                    <span className="text-white font-medium">New Notebook</span>
+                    <span className="text-white font-medium">New Source</span>
                 </button>
 
                 {showNewCollection && (
-                    <div className="mt-2 flex gap-2">
+                    <div className="mt-2 flex flex-col gap-2">
                         <input
                             type="text"
                             value={newCollectionName}
@@ -100,7 +100,7 @@ export default function Sidebar({
                         />
                         <button
                             onClick={handleCreateCollection}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-500 cursor-pointer"
                         >
                             Create
                         </button>
@@ -109,18 +109,18 @@ export default function Sidebar({
             </div>
             <div className="flex-1 overflow-y-auto">
                 <div className="p-4">
-                    <h2 className="text-sm font-medium text-white mb-3">Your Notebooks</h2>
+                    <h2 className="text-sm font-medium text-white mb-3">Your Sources</h2>
                     <div className="space-y-2">
                         {collections.map((collection) => (
                             <button
                                 key={collection.name}
                                 onClick={() => onCollectionSelect(collection.name)}
                                 className={`w-full text-left p-3 rounded-lg transition-colors ${selectedCollection === collection.name
-                                    ? 'bg-blue-500 border border-blue-200'
-                                    : 'hover:bg-blue-500'
+                                    ? 'bg-blue-600 border border-blue-200'
+                                    : 'hover:bg-blue-500 backdrop-blur-2xl'
                                     }`}
                             >
-                                <div className="flex items-start gap-3">
+                                <div className="flex items-start gap-3 cursor-pointer">
                                     <FolderIcon className="w-5 h-5 text-white mt-0.5" />
                                     <div className="flex-1 min-w-0">
                                         <div className="font-medium text-white truncate">
@@ -137,20 +137,20 @@ export default function Sidebar({
                 </div>
             </div>
             {/* Textarea for storing text in Qdrant */}
-            <div className="flex flex-col p-4 border-b border-gray-800 items-center justify-center">
+            <div className="flex flex-col p-4 items-center justify-center">
                 <label className="block text-white font-medium mb-2 text-center">Data Store</label>
                 <textarea
                     value={textToStore}
                     onChange={e => setTextToStore(e.target.value)}
                     rows={8}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2 bg-zinc-800 text-white"
-                    placeholder="Enter text to store in the selected collection..."
-                    disabled={storeLoading}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2  text-white backdrop-blur-2xl placeholder-gray-300"
+                    placeholder="Select a source and upload text to store..."
+                    disabled={storeLoading || !selectedCollection}
                 />
                 <button
                     onClick={handleStoreText}
-                    disabled={storeLoading}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+                    disabled={!textToStore.trim() || storeLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 cursor-pointer disabled:cursor-not-allowed"
                 >
                     {storeLoading ? 'Storing...' : 'Submit'}
                 </button>
