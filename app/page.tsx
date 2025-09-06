@@ -10,6 +10,7 @@ import Silk from '@/components/Silk';
 export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const handleCollectionSelect = (collectionName: string) => {
     setSelectedCollection(collectionName);
@@ -24,9 +25,15 @@ export default function Home() {
       ]);
     }
   };
+
   const handleDocumentAdded = async () => {
     await fetchCollections();
   };
+
+  const handleToggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -94,8 +101,9 @@ export default function Home() {
           selectedCollection={selectedCollection}
           onCollectionSelect={handleCollectionSelect}
           onRefresh={fetchCollections}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={handleToggleSidebar}
         />
-
 
         <div className="flex-1 flex flex-col">
           <ChatInterface

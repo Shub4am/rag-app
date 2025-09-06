@@ -2,20 +2,24 @@
 
 import { useState } from 'react';
 import { Collection } from '@/types';
-import { FolderIcon, PlusIcon, RefreshCcwIcon } from 'lucide-react';
+import { FolderIcon, PlusIcon, RefreshCcwIcon, SidebarIcon } from 'lucide-react';
 
 interface SidebarProps {
     collections: Collection[];
     selectedCollection: string;
     onCollectionSelect: (collection: string) => void;
     onRefresh: () => void;
+    isCollapsed: boolean;
+    onToggleCollapse: () => void;
 }
 
 export default function Sidebar({
     collections,
     selectedCollection,
     onCollectionSelect,
-    onRefresh
+    onRefresh,
+    isCollapsed,
+    onToggleCollapse
 }: SidebarProps) {
     const [textToStore, setTextToStore] = useState('');
     const [storeStatus, setStoreStatus] = useState<string | null>(null);
@@ -67,17 +71,56 @@ export default function Sidebar({
         }
     };
 
+    if (isCollapsed) {
+        return (
+            <div className="w-16 bg-transparent border-r border-gray-200 flex flex-col items-center py-4">
+                <button
+                    onClick={onToggleCollapse}
+                    className="p-3 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer mb-4 backdrop-blur-2xl"
+                    title="Expand sidebar"
+                >
+                    <SidebarIcon className="w-4 h-4 text-white" />
+                </button>
+
+                <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+                    {collections.map((collection) => (
+                        <button
+                            key={collection.name}
+                            onClick={() => onCollectionSelect(collection.name)}
+                            className={`p-3 rounded-lg transition-colors ${selectedCollection === collection.name
+                                ? 'bg-blue-600 border border-blue-200'
+                                : 'hover:bg-blue-500 backdrop-blur-2xl'
+                                }`}
+                            title={collection.name}
+                        >
+                            <FolderIcon className="w-4 h-4 text-white" />
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-80 bg-transparent border-r border-gray-200 flex flex-col">
             <div className="p-4 border-b border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                     <h1 className="text-xl font-semibold text-white">Root LM</h1>
-                    <button
-                        onClick={onRefresh}
-                        className="p-2 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer"
-                    >
-                        <RefreshCcwIcon className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={onRefresh}
+                            className="p-2 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer"
+                        >
+                            <RefreshCcwIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={onToggleCollapse}
+                            className="p-2 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer"
+                            title="Collapse sidebar"
+                        >
+                            <SidebarIcon className="w-4 h-4 text-white" />
+                        </button>
+                    </div>
                 </div>
 
                 <button
@@ -136,7 +179,6 @@ export default function Sidebar({
                     </div>
                 </div>
             </div>
-            {/* Textarea for storing text in Qdrant */}
             <div className="flex flex-col p-4 items-center justify-center">
                 <label className="block text-white font-medium mb-2 text-center">Data Store</label>
                 <textarea
