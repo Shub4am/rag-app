@@ -23,6 +23,7 @@ interface SidebarProps {
     onRefresh: () => void;
     isCollapsed: boolean;
     onToggleCollapse: () => void;
+    onClearChat?: () => void;
 }
 
 export default function Sidebar({
@@ -31,7 +32,8 @@ export default function Sidebar({
     onCollectionSelect,
     onRefresh,
     isCollapsed,
-    onToggleCollapse
+    onToggleCollapse,
+    onClearChat
 }: SidebarProps) {
     const [textToStore, setTextToStore] = useState('');
     const [storeStatus, setStoreStatus] = useState<string | null>(null);
@@ -92,6 +94,9 @@ export default function Sidebar({
                 onRefresh();
                 if (selectedCollection === name) {
                     onCollectionSelect('');
+                    if (typeof onClearChat === "function") {
+                        onClearChat();
+                    }
                 }
                 toast(`Collection "${name}" deleted successfully!`);
             } else {

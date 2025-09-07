@@ -11,6 +11,8 @@ export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleCollectionSelect = (collectionName: string) => {
     setSelectedCollection(collectionName);
@@ -33,9 +35,6 @@ export default function Home() {
   const handleToggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
-
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchCollections();
@@ -103,6 +102,7 @@ export default function Home() {
           onRefresh={fetchCollections}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={handleToggleSidebar}
+          onClearChat={() => setMessages([])}
         />
 
         <div className="flex-1 flex flex-col">
