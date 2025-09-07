@@ -33,7 +33,7 @@ A Next.js-based Retrieval-Augmented Generation (RAG) application that allows use
 
 ## Project Screenshot
 
-<img width="1920" height="1080" alt="Screenshot 2025-08-20 192217" src="https://github.com/user-attachments/assets/cc98dda3-3146-4810-a4fe-4e705bae9c4c" />
+<img width="1920" height="1080" alt="Screenshot 2025-09-07 105212" src="https://github.com/user-attachments/assets/bffadf79-dcdc-4181-8510-3ae5f645b073" />
 
 
 ### Prerequisites
