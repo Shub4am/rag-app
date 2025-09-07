@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
             await qdrant.getCollection(name);
             collectionExists = true;
         } catch (error) {
+            collectionExists = false;
         }
 
         if (!collectionExists) {
@@ -75,8 +76,9 @@ export async function GET() {
                 try {
                     const info = await qdrant.getCollection(collection.name);
                     documentCount = info.points_count || 0;
-                } catch (err) {
+                } catch (error) {
                     documentCount = 0;
+                    return new Response(error instanceof Error ? error.message : String(error));
                 }
                 return {
                     name: collection.name,

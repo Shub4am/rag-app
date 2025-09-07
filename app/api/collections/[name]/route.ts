@@ -8,20 +8,27 @@ const qdrant = new QdrantClient({
 
 export async function DELETE(
     request: NextRequest,
-    context: { params: { name: string } }
+    { params }: { params: Promise<{ name: string }> }
 ) {
-    const { name } = await context.params;
-    if (!name) {
-        return NextResponse.json({ error: 'Collection name is required.' }, { status: 400 });
-    }
     try {
+        const { name } = await params;
+
+        if (!name) {
+            return NextResponse.json({ error: 'Collection name is required.' }, { status: 400 });
+        }
+
         await qdrant.deleteCollection(name);
-        return NextResponse.json({ success: true });
+
+        return NextResponse.json({
+            success: true,
+            message: `Collection ${name} deleted successfully`
+        });
     } catch (error) {
+        console.error('Error deleting collection:', error);
         return NextResponse.json(
             {
                 error: 'Failed to delete collection',
-                details: error instanceof Error ? error.message : String(error),
+                details: error instanceof Error ? error.message : String(error)
             },
             { status: 500 }
         );
