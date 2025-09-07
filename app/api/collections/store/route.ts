@@ -8,8 +8,6 @@ export async function POST(request: NextRequest) {
         if (!collection || !text) {
             return NextResponse.json({ error: 'Collection and text are required.' }, { status: 400 });
         }
-
-        // Create a document object for Qdrant
         const doc = {
             pageContent: text,
             metadata: {
@@ -26,7 +24,6 @@ export async function POST(request: NextRequest) {
                 collectionName: collection,
             });
         } catch (error) {
-            // If collection does not exist, create it
             vectorStore = await QdrantVectorStore.fromDocuments([doc], embeddings, {
                 url: process.env.QDRANT_URL || 'http://localhost:6333',
                 collectionName: collection,

@@ -2,7 +2,19 @@
 
 import { useState } from 'react';
 import { Collection } from '@/types';
-import { FolderIcon, PlusIcon, RefreshCcwIcon, SidebarIcon } from 'lucide-react';
+import { FolderIcon, PlusIcon, RefreshCcwIcon, SidebarIcon, Trash } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger
+} from './ui/alert-dialog';
+import { toast } from 'sonner';
 
 interface SidebarProps {
     collections: Collection[];
@@ -52,7 +64,6 @@ export default function Sidebar({
             setStoreStatus(data.error || 'Failed to store text.');
         }
         setStoreLoading(false);
-        console.log("stored test:", textToStore)
     };
 
     const handleCreateCollection = async () => {
@@ -71,9 +82,32 @@ export default function Sidebar({
         }
     };
 
+    const handleDeleteCollection = async (name: string) => {
+        try {
+            const res = await fetch(`/api/collections/${encodeURIComponent(name)}`, {
+                method: 'DELETE',
+            });
+            if (res.ok) {
+                setStoreStatus(null);
+                onRefresh();
+                if (selectedCollection === name) {
+                    onCollectionSelect('');
+                }
+                toast(`Collection "${name}" deleted successfully!`);
+            } else {
+                const data = await res.json();
+                setStoreStatus(data.error || 'Failed to delete collection.');
+                toast(data.error || 'Failed to delete collection.');
+            }
+        } catch (err) {
+            setStoreStatus('Failed to delete collection.');
+            toast('Failed to delete collection.');
+        }
+    };
+
     if (isCollapsed) {
         return (
-            <div className="w-16 bg-transparent border-r border-gray-200 flex flex-col items-center py-4">
+            <div className="w-16 bg-transparent border-r border-gray-200 flex flex-col items-center py-4 hover:bg-black/45">
                 <button
                     onClick={onToggleCollapse}
                     className="p-3 hover:bg-blue-600 rounded-lg transition-colors cursor-pointer mb-4 backdrop-blur-2xl"
@@ -102,7 +136,7 @@ export default function Sidebar({
     }
 
     return (
-        <div className="w-80 bg-transparent border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-transparent border-r border-gray-200 flex flex-col ">
             <div className="p-4 border-b border-gray-300">
                 <div className="flex items-center justify-between mb-4">
                     <h1 className="text-xl font-semibold text-white">Root LM</h1>
@@ -155,26 +189,50 @@ export default function Sidebar({
                     <h2 className="text-sm font-medium text-white mb-3">Your Sources</h2>
                     <div className="space-y-2">
                         {collections.map((collection) => (
-                            <button
-                                key={collection.name}
-                                onClick={() => onCollectionSelect(collection.name)}
-                                className={`w-full text-left p-3 rounded-lg transition-colors ${selectedCollection === collection.name
-                                    ? 'bg-blue-600 border border-blue-200'
-                                    : 'hover:bg-blue-500 backdrop-blur-2xl'
-                                    }`}
-                            >
-                                <div className="flex items-start gap-3 cursor-pointer">
-                                    <FolderIcon className="w-5 h-5 text-white mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-white truncate">
-                                            {collection.name}
-                                        </div>
-                                        <div className="text-xs text-gray-200 mt-1">
-                                            {collection.documentCount} documents
+                            <div key={collection.name} className='flex gap-1'>
+                                <button
+                                    onClick={() => onCollectionSelect(collection.name)}
+                                    className={`w-full text-left p-3 rounded-lg transition-colors ${selectedCollection === collection.name
+                                        ? 'bg-blue-600 border border-blue-200'
+                                        : 'hover:bg-blue-500 backdrop-blur-2xl'
+                                        }`}
+                                >
+                                    <div className="flex gap-3 cursor-pointer justify-center items-center">
+                                        <FolderIcon className="w-5 h-5 text-white mt-0.5" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-white truncate">
+                                                {collection.name}
+                                            </div>
+                                            <div className="text-xs text-gray-200 mt-1">
+                                                {collection.documentCount} documents
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </button>
+                                </button>
+
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <button className="p-1 rounded-lg transition-colors cursor-pointer ">
+                                            <Trash className=" text-white" />
+                                        </button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent className='bg-zinc-900'>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone.<br />
+                                                This will permanently delete your collection from our servers.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel className='bg-red-500 hover:bg-red-700 border-none cursor-pointer'>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteCollection(collection.name)} className='bg-green-600 hover:bg-green-700 cursor-pointer'>
+                                                Continue
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
                         ))}
                     </div>
                 </div>

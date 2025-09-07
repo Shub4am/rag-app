@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
-import { saveToQdrant, splitDocs } from '@/lib/utils';
+import { saveToQdrant, splitDocs } from '@/lib/dbUtils';
+
 
 export async function POST(request: NextRequest) {
     try {
