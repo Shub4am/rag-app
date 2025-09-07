@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { CSVLoader } from '@langchain/community/document_loaders/fs/csv';
-import { saveToQdrant, splitDocs } from '@/lib/utils';
+import { saveToQdrant, splitDocs } from '@/lib/dbUtils';
+
 
 export async function POST(request: NextRequest) {
     try {
