@@ -4,13 +4,13 @@ export interface Collection {
     lastUpdated: string;
 }
 
-export interface ChatMessage {
-    id: string;
-    content: string;
-    role: 'user' | 'assistant';
-    timestamp: Date;
-    sources?: Source[];
-}
+// export interface ChatMessage {
+//     id: string;
+//     content: string;
+//     role: 'user' | 'assistant';
+//     timestamp: Date;
+//     sources?: Source[];
+// }
 
 export interface Source {
     chunk: number;
