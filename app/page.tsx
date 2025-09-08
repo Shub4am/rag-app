@@ -1,18 +1,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
+
 import Sidebar from '@/components/Sidebar';
 import ChatInterface from '@/components/ChatInterface';
 import DocumentPanel from '@/components/DocumentPanel';
-import { Collection, ChatMessage } from '@/types';
 import Silk from '@/components/Silk';
+
+import { Collection } from '@/types';
 
 export default function Home() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [input, setInput] = useState('');
+  const {
+    messages,
+    sendMessage,
+    status,
+    error,
+    setMessages,
+  } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+    onError: (error) => {
+      console.error('Chat error:', error);
+    },
+  });
+
 
   const handleCollectionSelect = (collectionName: string) => {
     setSelectedCollection(collectionName);
@@ -52,44 +73,51 @@ export default function Home() {
     }
   };
 
-  const sendMessage = async (message: string) => {
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: message,
-      role: 'user',
-      timestamp: new Date()
-    };
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    setMessages(prev => [...prev, userMessage]);
-    setLoading(true);
+    if (!selectedCollection || !input.trim()) return;
 
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message,
-          collection: selectedCollection
-        })
-      });
+    const timestamp = new Date().toISOString();
 
-      const data = await response.json();
-
-      if (data.success) {
-        const aiMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: data.response,
-          role: 'assistant',
-          timestamp: new Date(),
-          sources: data.sources
-        };
-        setMessages(prev => [...prev, aiMessage]);
+    sendMessage(
+      {
+        role: 'user',
+        parts: [{ type: 'text', text: input }],
+      },
+      {
+        body: {
+          collection: selectedCollection,
+        },
       }
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setLoading(false);
-    }
+    );
+
+
+    setInput('');
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const clearChat = () => {
+    setMessages([]);
+  };
+
+  const sendSuggestedMessage = (text: string) => {
+    if (!selectedCollection) return;
+    sendMessage(
+      {
+        role: 'user',
+        parts: [{ type: 'text', text }],
+      },
+      {
+        body: {
+          collection: selectedCollection,
+        },
+      }
+    );
+
   };
 
   return (
@@ -102,15 +130,19 @@ export default function Home() {
           onRefresh={fetchCollections}
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={handleToggleSidebar}
-          onClearChat={() => setMessages([])}
+          onClearChat={clearChat}
         />
 
         <div className="flex-1 flex flex-col">
           <ChatInterface
             messages={messages}
-            onSendMessage={sendMessage}
-            loading={loading}
+            input={input}
+            handleInputChange={handleInputChange}
+            handleSubmit={handleSubmit}
+            isLoading={status === 'submitted' || status === 'streaming'}
             selectedCollection={selectedCollection}
+            error={error}
+            onSendSuggestedMessage={sendSuggestedMessage}
           />
         </div>
 
