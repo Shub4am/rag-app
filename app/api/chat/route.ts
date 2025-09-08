@@ -1,22 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { QdrantVectorStore } from '@langchain/qdrant';
-import OpenAI from 'openai';
-
-const client = new OpenAI();
+import { openai } from '@ai-sdk/openai';
+import { streamText, convertToModelMessages } from 'ai';
 
 export async function POST(request: NextRequest) {
     try {
-        const { message, collection } = await request.json();
-        if (!message) {
+        const { messages, collection } = await request.json();
+
+        if (!messages || !Array.isArray(messages)) {
             return NextResponse.json(
-                { error: 'Message is required' },
+                { error: 'Messages array is required' },
                 { status: 400 }
             );
         }
         if (!collection) {
             return NextResponse.json(
                 { error: 'Collection is required' },
+                { status: 400 }
+            );
+        }
+        const latestMessage = messages[messages.length - 1];
+        if (!latestMessage || latestMessage.role !== 'user') {
+            return NextResponse.json(
+                { error: 'Latest message must be from user' },
+                { status: 400 }
+            );
+        }
+        const userMessageText = latestMessage.parts
+            ?.filter((part: { type: string; }) => part.type === 'text')
+            .map((part: { text: string; }) => part.text)
+            .join(' ') || '';
+
+        if (!userMessageText.trim()) {
+            return NextResponse.json(
+                { error: 'User message must contain text' },
                 { status: 400 }
             );
         }
@@ -34,16 +52,18 @@ export async function POST(request: NextRequest) {
         );
 
         const retriever = vectorStore.asRetriever({ k: 5, searchType: 'mmr' });
-        const relevantChunks = await retriever.invoke(message);
+        const relevantChunks = await retriever.invoke(userMessageText);
 
         if (relevantChunks.length === 0) {
-            return NextResponse.json({
-                success: true,
-                response:
-                    "I don't have any relevant information in the selected collection to answer your question.",
-                sources: [],
+            const result = streamText({
+                model: openai('gpt-4o-mini'),
+                messages: convertToModelMessages(messages),
+                system: "You are a helpful AI assistant. I don't have any relevant information in the selected collection to answer the user's question. Please let them know politely and suggest they upload relevant documents or try a different question."
             });
+
+            return result.toUIMessageStreamResponse();
         }
+
         const contextText = relevantChunks
             .map((doc, i) => {
                 const pageInfo = doc.metadata.pageNumber
@@ -59,53 +79,38 @@ export async function POST(request: NextRequest) {
                     ? `(File: ${doc.metadata.filename})`
                     : '';
 
-                return `Chunk ${i + 1
-                    } ${pageInfo} ${sourceInfo} ${rowInfo} ${fileInfo}:\n${doc.pageContent
-                    }`;
+                return `Chunk ${i + 1} ${pageInfo} ${sourceInfo} ${rowInfo} ${fileInfo}:\n${doc.pageContent}`;
             })
             .join('\n\n');
 
         const SYSTEM_PROMPT = `
-      You are an AI assistant who answers queries based ONLY on the given context. 
-      - Greet the user positively ONLY on the very first reply.
-      - DO NOT repeat the greeting in any later responses and try to divert conversation to the file upload or website url upload.
-      Always cite the source:
-      - For PDFs → include the page number and filename if available.
-      - For web docs → include the source URL.
-      - For CSVs → include row number and filename.
+You are an AI assistant who answers queries based ONLY on the given context. 
+- Greet the user positively ONLY on the very first reply.
+- DO NOT repeat the greeting in any later responses and try to divert conversation to the file upload or website url upload.
+Always cite the source:
+- For PDFs → include the page number and filename if available.
+- For web docs → include the source URL.
+- For CSVs → include row number and filename.
 
-      If the answer is not in the context, reply:
-      "Unsure about answer"
+If the answer is not in the context, reply:
+"Unsure about answer"
 
-      Context:
-      ${contextText}
-      `;
+Context:
+${contextText}
+        `;
+        const modelMessages = convertToModelMessages(messages);
 
-        const completion = await client.chat.completions.create({
-            model: 'gpt-4o-mini',
-            messages: [
-                { role: 'system', content: SYSTEM_PROMPT },
-                { role: 'user', content: message },
-            ],
+        const result = streamText({
+            model: openai('gpt-4o-mini'),
+            messages: modelMessages,
+            system: SYSTEM_PROMPT,
         });
 
-        const response = completion.choices[0].message.content;
-        let sources = relevantChunks.map((doc, i) => ({
-            chunk: i + 1,
-            pageNumber: doc.metadata.pageNumber,
-            source: doc.metadata.source,
-            row: doc.metadata.row,
-            filename: doc.metadata.filename || doc.metadata.file,
-            content: doc.pageContent.substring(0, 200) + '...',
-        }));
-        if (response && response.trim() === 'Unsure about answer' || "Hello! How can I assist you today?") {
-            sources = [];
-        }
-        return NextResponse.json({
-            success: true,
-            response,
-            sources,
-            collection,
+        return result.toUIMessageStreamResponse({
+            onError: (error) => {
+                console.error('Stream error:', error);
+                return 'An error occurred while processing your request';
+            },
         });
     } catch (error) {
         console.error('Error in chat:', error);
