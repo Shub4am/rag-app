@@ -15,24 +15,31 @@ export async function splitDocs(docs: any[], extraMetadata = {}) {
     }));
 }
 
-export async function saveToQdrant(docs: any[], collectionName: string) {
+export async function saveToQdrant(docs: any[], collectionName: string, userId: string) {
     if (!docs || docs.length === 0) {
         throw new Error(`No documents to index for ${collectionName}`);
     }
+    const userCollectionName = `${userId}_${collectionName}`;
+    const docsWithUserId = docs.map((doc) => ({
+        ...doc,
+        metadata: {
+            ...doc.metadata,
+            userId,
+        },
+    }));
 
     const embeddings = new OpenAIEmbeddings({ model: 'text-embedding-3-small' });
-
     try {
         const vectorStore = await QdrantVectorStore.fromExistingCollection(
             embeddings,
             {
                 url: process.env.QDRANT_URL || 'http://localhost:6333',
                 apiKey: process.env.QDRANT_API_KEY,
-                collectionName,
+                collectionName: userCollectionName,
             },
         );
 
-        await vectorStore.addDocuments(docs);
+        await vectorStore.addDocuments(docsWithUserId);
         return { success: true, count: docs.length };
     } catch (error) {
         if (
@@ -46,14 +53,14 @@ export async function saveToQdrant(docs: any[], collectionName: string) {
             )
         ) {
             const vectorStore = await QdrantVectorStore.fromDocuments(
-                docs,
+                docsWithUserId,
                 embeddings,
                 {
                     url: process.env.QDRANT_URL || 'http://localhost:6333',
-                    collectionName,
+                    collectionName: userCollectionName,
                 },
             );
-            console.log(vectorStore)
+
             return { success: true, count: docs.length, created: true };
         }
         throw error;
