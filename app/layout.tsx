@@ -10,7 +10,7 @@ import {
 } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
 import Link from "next/link";
-import { MessageSquare } from 'lucide-react';
+import { MessageCircleMore } from 'lucide-react';
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -42,17 +42,17 @@ export default function RootLayout({
           <header className="relative z-50 px-6 py-4 backdrop-blur-2xl bg-black/50 text-white">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center space-x-2">
-                <MessageSquare className="h-8 w-8 text-purple-300" />
+                <MessageCircleMore className="h-8 w-8 text-white" />
                 <span className="text-2xl font-bold">Root LM</span>
               </Link>
 
               <div className="hidden md:flex items-center space-x-8">
                 <SignedOut>
-                  <Link href="#features" className="hover:text-purple-300 transition-colors">Features</Link>
-                  <Link href="#how-it-works" className="hover:text-purple-300 transition-colors">How it Works</Link>
-                  <Link href="#pricing" className="hover:text-purple-300 transition-colors">Pricing</Link>
+                  <Link href="#features" className="hover:text-green-300 transition-colors">Features</Link>
+                  <Link href="#how-it-works" className="hover:text-green-300 transition-colors">How it Works</Link>
+                  <Link href="#pricing" className="hover:text-green-300 transition-colors">Pricing</Link>
                   <SignInButton>
-                    <button className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg transition-colors cursor-pointer">
+                    <button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 px-6 py-2 rounded-lg transition-colors cursor-pointer">
                       Sign In
                     </button>
                   </SignInButton>

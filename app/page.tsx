@@ -1,8 +1,9 @@
 'use client'
 import { useUser } from '@clerk/nextjs';
-import { ArrowRight, FileText, Database, Link, MessageSquare, Upload, Zap, Shield, Users } from 'lucide-react';
+import { ArrowRight, FileText, Database, MessageSquare, Upload, Zap, Shield, Users, LinkIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Link from "next/link";
 
 export default function Page() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -21,35 +22,35 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black/50 via-purple-950 to-indigo-950 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black text-white">
       {/* Hero Section */}
       <section className="relative px-6 py-20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="relative">
             {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-30">
-              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-              <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-75"></div>
-              <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-150"></div>
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-500 rounded-full mix-blend-screen filter blur-xl animate-pulse"></div>
+              <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-screen filter blur-xl animate-pulse delay-75"></div>
+              <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-lime-500 rounded-full mix-blend-screen filter blur-xl animate-pulse delay-150"></div>
             </div>
 
             <div className="relative z-10">
               {isSignedIn && (
-                <p className="text-2xl text-purple-300 p-5">
+                <p className="text-2xl text-white p-5">
                   Hey {user.firstName}, welcome back!
                 </p>
               )}
 
-              <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-transparent">
+              <h1 className="text-6xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-green-400 via-green-200 to-lime-500 bg-clip-text text-transparent">
                 Chat with Your Documents
               </h1>
-              <p className="text-xl md:text-2xl text-purple-200 mb-12 max-w-4xl mx-auto">
+              <p className="text-xl md:text-2xl text-gray-100 mb-12 max-w-4xl mx-auto">
                 Upload PDFs, CSVs, or web URLs and have intelligent conversations with your content.
                 Powered by advanced AI to understand and answer questions about your documents.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-                <button onClick={handleChatNavigation} className="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 cursor-pointer">
+                <button onClick={handleChatNavigation} className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 cursor-pointer shadow-lg shadow-green-500/25 hover:shadow-green-400/30">
                   <span>Try RootLM Now</span>
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -60,72 +61,72 @@ export default function Page() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="px-6 py-20 bg-black/20 backdrop-blur-sm">
+      <section id="features" className="px-6 py-20 bg-black/40 backdrop-blur-sm border-t border-green-500/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Powerful Features</h2>
-            <p className="text-xl text-purple-200 max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">Powerful Features</h2>
+            <p className="text-xl text-gray-100 max-w-2xl mx-auto">
               Everything you need to unlock insights from your documents
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-purple-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-600/30 transition-colors">
-                <FileText className="h-8 w-8 text-purple-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-green-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600/30 transition-colors border border-green-500/30">
+                <FileText className="h-8 w-8 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">PDF Support</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">PDF Support</h3>
+              <p className="text-white">
                 Upload and analyze PDF documents of any size. Extract text, understand structure, and get intelligent answers.
               </p>
             </div>
 
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-indigo-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-600/30 transition-colors">
-                <Database className="h-8 w-8 text-indigo-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-emerald-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-emerald-600/30 transition-colors border border-emerald-500/30">
+                <Database className="h-8 w-8 text-emerald-500" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">CSV Analysis</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">CSV Analysis</h3>
+              <p className="text-white">
                 Import CSV files and perform complex data analysis through natural language queries and conversations.
               </p>
             </div>
 
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-pink-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-pink-600/30 transition-colors">
-                <Link className="h-8 w-8 text-pink-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-lime-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-lime-600/30 transition-colors border border-lime-500/30">
+                <LinkIcon className="h-8 w-8 text-lime-500" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Web URL Processing</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">Web URL Processing</h3>
+              <p className="text-white">
                 Paste any web URL and instantly start chatting with the content from websites, articles, and more.
               </p>
             </div>
 
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-emerald-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-emerald-600/30 transition-colors">
-                <Zap className="h-8 w-8 text-emerald-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-green-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-600/30 transition-colors border border-green-500/30">
+                <Zap className="h-8 w-8 text-green-300" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Lightning Fast</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">Lightning Fast</h3>
+              <p className="text-white">
                 Get instant responses powered by state-of-the-art AI models optimized for document understanding.
               </p>
             </div>
 
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-blue-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600/30 transition-colors">
-                <Shield className="h-8 w-8 text-blue-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-emerald-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-emerald-600/30 transition-colors border border-emerald-500/30">
+                <Shield className="h-8 w-8 text-emerald-300" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Secure & Private</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">Secure & Private</h3>
+              <p className="text-white">
                 Your documents are processed securely with enterprise-grade encryption and privacy protection.
               </p>
             </div>
 
-            <div className="group p-8 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 hover:transform hover:scale-105">
-              <div className="bg-orange-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-orange-600/30 transition-colors">
-                <Users className="h-8 w-8 text-orange-300" />
+            <div className="group p-8 rounded-2xl bg-gradient-to-br from-gray-900/80 to-black/80 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/10">
+              <div className="bg-lime-600/20 w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:bg-lime-600/30 transition-colors border border-lime-500/30">
+                <Users className="h-8 w-8 text-lime-300" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">Team Collaboration</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">Team Collaboration</h3>
+              <p className="text-white">
                 Share sources and collaborate with your team. Build knowledge bases that everyone can access.
               </p>
             </div>
@@ -137,39 +138,39 @@ export default function Page() {
       <section id="how-it-works" className="px-6 py-20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
-            <p className="text-xl text-purple-200 max-w-2xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">How It Works</h2>
+            <p className="text-xl text-white max-w-2xl mx-auto">
               Get started in three simple steps
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="bg-gradient-to-br from-purple-600 to-indigo-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="bg-gradient-to-br from-green-600 to-emerald-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/30">
                 <Upload className="h-10 w-10" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">1. Upload Your Content</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">1. Upload Your Content</h3>
+              <p className="text-white">
                 Drag and drop PDFs, upload CSV files, or paste web URLs. We support multiple formats and large files.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-gradient-to-br from-indigo-600 to-pink-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="bg-gradient-to-br from-emerald-600 to-lime-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30">
                 <Zap className="h-10 w-10" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">2. AI Processing</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">2. AI Processing</h3>
+              <p className="text-white">
                 Our advanced AI analyzes your content, understanding context, structure, and key information automatically.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-gradient-to-br from-pink-600 to-purple-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="bg-gradient-to-br from-lime-600 to-green-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-lime-500/30">
                 <MessageSquare className="h-10 w-10" />
               </div>
-              <h3 className="text-2xl font-bold mb-4">3. Start Chatting</h3>
-              <p className="text-purple-200">
+              <h3 className="text-2xl font-bold mb-4 text-white">3. Start Chatting</h3>
+              <p className="text-white">
                 Ask questions, request summaries, or explore your documents through natural conversation.
               </p>
             </div>
@@ -178,17 +179,17 @@ export default function Page() {
       </section>
 
       {/* CTA Section */}
-      <section className="px-6 py-20 bg-gradient-to-r from-black/50 to-purple-900/50 backdrop-blur-sm">
+      <section className="px-6 py-20 bg-gradient-to-r from-black/60 to-gray-900/60 backdrop-blur-sm border-t border-green-500/20">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
             Ready to Transform Your Documents?
           </h2>
-          <p className="text-xl text-purple-200 mb-10">
+          <p className="text-xl text-white mb-10">
             Join thousands of users who are already chatting with their documents and unlocking insights.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button onClick={handleChatNavigation} className="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-10 py-5 rounded-xl text-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-3 cursor-pointer">
+            <button onClick={handleChatNavigation} className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 px-10 py-5 rounded-xl text-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-3 cursor-pointer shadow-lg shadow-green-500/25 hover:shadow-green-400/30">
               <span>Try RootLM Now</span>
               <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -197,50 +198,50 @@ export default function Page() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-12 border-t border-purple-800/30 bg-black/20 backdrop-blur-sm">
+      <footer className="px-6 py-12 border-t border-green-500/30 bg-black/40 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <MessageSquare className="h-8 w-8 text-purple-300" />
-                <span className="text-2xl font-bold">Root LM</span>
+                <MessageSquare className="h-8 w-8 text-green-300" />
+                <span className="text-2xl font-bold text-white">Root LM</span>
               </div>
-              <p className="text-purple-200">
+              <p className="text-white">
                 Intelligent document chat powered by advanced AI technology.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-purple-200">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+              <h4 className="font-semibold mb-4 text-white">Product</h4>
+              <ul className="space-y-2 text-white">
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Features</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Pricing</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">API</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Documentation</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-purple-200">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <h4 className="font-semibold mb-4 text-white">Company</h4>
+              <ul className="space-y-2 text-white">
+                <li><Link href="#" className="hover:text-green-400 transition-colors">About</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Blog</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Contact</Link></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-purple-200">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+              <h4 className="font-semibold mb-4 text-white">Support</h4>
+              <ul className="space-y-2 text-white">
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Help Center</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="#" className="hover:text-green-400 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/api/health" className="hover:text-green-400 transition-colors">Status</Link></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-purple-800/30 mt-12 pt-8 text-center text-purple-200">
+          <div className="border-t border-green-500/30 mt-12 pt-8 text-center text-white">
             <p>&copy; 2025 Root LM. All rights reserved.</p>
           </div>
         </div>

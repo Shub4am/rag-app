@@ -19,3 +19,13 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* #00c951 */
+.cl-card {
+  background-color: #00000000;
+}
+
+.cl-internal-1dauvpw,
+.cl-internal-l2l775 {
+  display: none;
+}
