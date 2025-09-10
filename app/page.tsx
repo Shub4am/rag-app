@@ -4,6 +4,7 @@ import { ArrowRight, FileText, Database, MessageSquare, Upload, Zap, Shield, Use
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from "next/link";
+import LiquidEther from '@/components/LiquidEther';
 
 export default function Page() {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -22,18 +23,31 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900/50 to-black text-white">
+    <div className="min-h-screen text-white">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 z-0 ">
+        <LiquidEther
+          colors={['#00ff00', '#a7f00f', '#2dce35']}
+          mouseForce={20}
+          cursorSize={100}
+          isViscous={false}
+          viscous={30}
+          iterationsViscous={32}
+          iterationsPoisson={32}
+          resolution={0.5}
+          isBounce={false}
+          autoDemo={true}
+          autoSpeed={0.5}
+          autoIntensity={2.2}
+          takeoverDuration={0.25}
+          autoResumeDelay={3000}
+          autoRampDuration={0.6}
+        />
+      </div>
       {/* Hero Section */}
       <section className="relative px-6 py-20">
         <div className="max-w-7xl mx-auto text-center">
           <div className="relative">
-            {/* Animated background elements */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-green-500 rounded-full mix-blend-screen filter blur-xl animate-pulse"></div>
-              <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-emerald-500 rounded-full mix-blend-screen filter blur-xl animate-pulse delay-75"></div>
-              <div className="absolute bottom-1/4 left-1/3 w-80 h-80 bg-lime-500 rounded-full mix-blend-screen filter blur-xl animate-pulse delay-150"></div>
-            </div>
-
             <div className="relative z-10">
               {isSignedIn && (
                 <p className="text-2xl text-white p-5">
