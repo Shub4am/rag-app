@@ -2,9 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { PDFLoader } from '@langchain/community/document_loaders/fs/pdf';
 import { saveToQdrant, splitDocs } from '@/lib/dbUtils';
+import { auth } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const data = await request.formData();
         const file: File | null = data.get('pdf') as unknown as File;
         const collection = data.get('collection') as string || 'pdf-collection';
@@ -35,8 +41,8 @@ export async function POST(request: NextRequest) {
             filename: file.name,
             uploadDate: new Date().toISOString(),
         });
-        const result = await saveToQdrant(splitDocsResult, collection);
 
+        const result = await saveToQdrant(splitDocsResult, collection, userId);
         return NextResponse.json({
             success: true,
             message: `PDF indexed successfully! ${result.count} chunks added to ${collection}`,
@@ -50,7 +56,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
             {
                 error: 'Failed to index PDF',
-                details: typeof error === 'object' && error !== null && 'message' in error ? (error as { message: string }).message : String(error),
+                details:
+                    typeof error === 'object' && error !== null && 'message' in error
+                        ? (error as { message: string }).message
+                        : String(error),
             },
             { status: 500 }
         );
