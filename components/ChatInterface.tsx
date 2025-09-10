@@ -38,7 +38,7 @@ export default function ChatInterface({
     ];
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-screen">
             <div className="bg-transparent border-b border-gray-200 p-4 text-center">
                 <h2 className="text-lg font-semibold text-white uppercase">
                     Chat with {selectedCollection || "A selected source"}
@@ -114,7 +114,7 @@ export default function ChatInterface({
                         onChange={handleInputChange}
                         placeholder="Select a source to chat about your documents..."
                         className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={isLoading || !selectedCollection}
+                        disabled={!selectedCollection}
                     />
                     <button
                         type="submit"
