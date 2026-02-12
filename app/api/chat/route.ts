@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
             const result = streamText({
                 model: openai('gpt-4o-mini'),
-                messages: convertToModelMessages(messages),
+                messages: await convertToModelMessages(messages),
                 system: "I'm sorry, but I couldn't find your document collection. Please make sure you have uploaded documents first, or the collection name is correct."
             });
 
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
                 const result = streamText({
                     model: openai('gpt-4o-mini'),
-                    messages: convertToModelMessages(messages),
+                    messages: await convertToModelMessages(messages),
                     system: "I'm sorry, but there was an error searching your documents. This might be due to an empty collection or a configuration issue. Please try uploading your documents again."
                 });
 
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         if (relevantChunks.length === 0) {
             const result = streamText({
                 model: openai('gpt-4o-mini'),
-                messages: convertToModelMessages(messages),
+                messages: await convertToModelMessages(messages),
                 system:
                     "I'm sorry, but I couldn't find relevant information in your uploaded documents. Please try uploading more relevant files or change your question."
             });
@@ -144,7 +144,7 @@ ${contextText}
 `;
 
 
-        const modelMessages = convertToModelMessages(messages);
+        const modelMessages = await convertToModelMessages(messages);
         const result = streamText({
             model: openai('gpt-4o-mini'),
             messages: modelMessages,
