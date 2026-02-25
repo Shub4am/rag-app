@@ -13,7 +13,7 @@
     "@ai-sdk/react": "^3.0.84",
     "@clerk/nextjs": "^6.37.3",
     "@clerk/themes": "^2.4.51",
-    "@langchain/community": "^1.1.15",
+    "@langchain/community": "^1.1.18",
     "@langchain/core": "^1.1.24",
     "@langchain/openai": "^1.2.7",
     "@langchain/qdrant": "^1.0.1",
